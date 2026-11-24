@@ -8,12 +8,14 @@ import { Container } from '@/components/ui/Container';
 const SITE_NAME = import.meta.env.VITE_SITE_NAME || 'Personal Portfolio';
 
 const NAV_ITEMS = [
-  { label: 'Dashboard', to: '/' },
-  { label: 'About Me', to: '/about-me' },
-  { label: 'Experience', to: '/experience' },
+  { label: 'About', to: '/' },
   { label: 'Projects', to: '/projects' },
-  { label: 'Skills', to: '/skills' },
-  { label: 'Contacts', to: '/contacts' },
+  { label: 'Artifacts', to: '/artifacts' },
+  { label: 'Experience', to: '/experience' },
+  { label: 'Tech Stack', to: '/tech-stack' },
+  { label: 'Gear', to: '/gear' },
+  { label: 'Blog', to: '/blog' },
+  { label: 'Contact', to: '/contact' },
 ] as const;
 
 export default function Header() {

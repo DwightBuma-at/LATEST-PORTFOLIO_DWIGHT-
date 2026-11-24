@@ -86,3 +86,18 @@ Verify every frontend change across representative viewports:
 - `1920px` (Large desktop)
 
 Ensure zero unintended horizontal overflow, no overlapping/clipped elements, accessible navigation and dialogs, and purposeful mobile layout adaptation without degrading the desktop appearance.
+
+## 7. Response Reporting Standard
+
+At the end of **every** response, always include:
+
+1. **Skills Used on This Prompt** — List which Antigravity Agent Skills were applied (or `None` for simple questions).
+2. **What Changed** — List the exact files created, edited, or deleted with clickable file links (or `No files modified in this turn.`).
+
+## 8. Quality-First Token & Context Efficiency
+
+Apply `token-context-optimization` automatically on all tasks:
+
+- Follow the strict priority order: (1) correctness & security, (2) explicit requirements, (3) design accuracy, (4) maintainability, (5) testing & visual verification, (6) token/context efficiency.
+- Load only relevant skills, read only directly relevant files first, batch independent tool calls, prefer targeted edits over full-file rewrites, and keep responses concise.
+- Never skip required analysis, tests, or browser/visual verification to save tokens.

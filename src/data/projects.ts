@@ -17,4 +17,28 @@ export const projects: Project[] = [
     featured: true,
     year: 'YYYY',
   },
+  {
+    id: 'project-placeholder-3',
+    title: '[Featured Project 3]',
+    summary: 'Placeholder project description. Replace with actual project scope and outcomes.',
+    tags: ['Full Stack', 'API'],
+    featured: true,
+    year: 'YYYY',
+  },
+  {
+    id: 'project-placeholder-4',
+    title: '[Featured Project 4]',
+    summary: 'Placeholder project description. Replace with actual project scope and outcomes.',
+    tags: ['TypeScript', 'Design System'],
+    featured: true,
+    year: 'YYYY',
+  },
+  {
+    id: 'project-placeholder-5',
+    title: '[Featured Project 5]',
+    summary: 'Placeholder project description. Replace with actual project scope and outcomes.',
+    tags: ['React', 'Performance'],
+    featured: true,
+    year: 'YYYY',
+  },
 ];
