@@ -11,11 +11,14 @@ export interface SocialLink {
 
 export interface PortfolioProfile {
   name: string;
+  fullName: string;
   role: string;
+  specialty: string;
   tagline: string;
   location: string;
   email: string;
   aboutSummary: string;
+  aboutParagraphs: string[];
   availability: string;
   socialLinks: SocialLink[];
 }

@@ -11,7 +11,6 @@ import {
   Layers,
   Mail,
   MessageSquare,
-  PencilLine,
   Plus,
   User,
 } from 'lucide-react';
@@ -42,7 +41,6 @@ const EXPLORE_PROMPTS = [
   { label: 'Where has Dwight worked?', to: '/experience', icon: Briefcase },
   { label: 'What technologies does Dwight use?', to: '/tech-stack', icon: Layers },
   { label: 'What gear does Dwight use?', to: '/gear', icon: Laptop },
-  { label: 'Does Dwight write?', to: '/blog', icon: PencilLine },
   { label: 'How can I contact Dwight?', to: '/contact', icon: Mail },
 ] as const;
 
@@ -140,9 +138,15 @@ export default function Dashboard() {
     const normalized = trimmed.toLowerCase();
     if (!normalized) return;
 
-    let targetRoute = '/projects';
+    let targetRoute = `/search?q=${encodeURIComponent(trimmed)}`;
     if (normalized.includes('about') || normalized.includes('bio') || normalized.includes('who')) {
       targetRoute = '/about';
+    } else if (
+      normalized.includes('project') ||
+      normalized.includes('built') ||
+      normalized.includes('portfolio')
+    ) {
+      targetRoute = '/projects';
     } else if (normalized.includes('exp') || normalized.includes('work')) {
       targetRoute = '/experience';
     } else if (
@@ -159,8 +163,6 @@ export default function Dashboard() {
       targetRoute = '/contact';
     } else if (normalized.includes('gear')) {
       targetRoute = '/gear';
-    } else if (normalized.includes('blog') || normalized.includes('write')) {
-      targetRoute = '/blog';
     } else if (normalized.includes('artifact')) {
       targetRoute = '/artifacts';
     }

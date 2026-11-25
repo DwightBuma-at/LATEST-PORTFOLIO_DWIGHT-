@@ -8,7 +8,6 @@ import {
   Layers,
   Mail,
   PanelLeft,
-  PencilLine,
   Plus,
   User,
 } from 'lucide-react';
@@ -30,19 +29,17 @@ const NAV_ITEMS = [
   { label: 'Experience', to: '/experience', icon: Briefcase },
   { label: 'Tech Stack', to: '/tech-stack', icon: Layers },
   { label: 'Gear', to: '/gear', icon: Laptop },
-  { label: 'Blog', to: '/blog', icon: PencilLine },
   { label: 'Contact', to: '/contact', icon: Mail },
 ] as const;
 
 const ROUTE_LABELS: Record<string, string> = {
-  '/about': 'About',
-  '/projects': 'Projects',
-  '/artifacts': 'Artifacts',
-  '/experience': 'Experience',
-  '/tech-stack': 'Tech Stack',
-  '/gear': 'Gear',
-  '/blog': 'Blog',
-  '/contact': 'Contact',
+  '/about': 'Who is Dwight?',
+  '/projects': 'What has Dwight built?',
+  '/artifacts': "Explore Dwight's artifacts",
+  '/experience': 'Where has Dwight worked?',
+  '/tech-stack': 'What technologies does Dwight use?',
+  '/gear': 'What gear does Dwight use?',
+  '/contact': 'How can I hire Dwight?',
 };
 
 interface RecentVisit {
@@ -127,27 +124,40 @@ function SidebarBody({
 
       {/* Primary action: + New (icon locked at exact same horizontal axis) */}
       <div className="px-2.5 pt-1 pb-[1px]">
-        <Tooltip open={collapsed ? undefined : false}>
-          <TooltipTrigger asChild>
+        {(() => {
+          const isNewActive = pathname === '/';
+          const newLink = (
             <Link
               to="/"
               onClick={onNavigate}
               aria-label="New"
-              aria-current={pathname === '/' ? 'page' : undefined}
-              className={`flex h-9 items-center overflow-hidden rounded-lg transition-colors ${
+              aria-current={isNewActive ? 'page' : undefined}
+              className={`flex h-9 items-center overflow-hidden rounded-lg ${
                 collapsed ? 'w-9 justify-center' : 'w-full gap-[10px] px-2.5'
               } ${
-                pathname === '/'
-                  ? 'bg-[#D8D8D1] font-medium text-[#141413]'
+                isNewActive
+                  ? 'bg-[#D97757] font-medium text-white'
                   : 'font-normal text-[#2E2D2A] hover:bg-[#E8E8E2] hover:text-[#141413]'
               }`}
             >
-              <Plus className="h-4 w-4 shrink-0 text-[#141413]" strokeWidth={2} aria-hidden="true" />
+              <Plus
+                className={`h-4 w-4 shrink-0 ${isNewActive ? 'text-white' : 'text-[#141413]'}`}
+                strokeWidth={2}
+                aria-hidden="true"
+              />
               {!collapsed ? <span className="truncate text-[14.5px]">New</span> : null}
             </Link>
-          </TooltipTrigger>
-          <TooltipContent side="right">New</TooltipContent>
-        </Tooltip>
+          );
+
+          if (!collapsed) return newLink;
+
+          return (
+            <Tooltip>
+              <TooltipTrigger asChild>{newLink}</TooltipTrigger>
+              <TooltipContent side="right">New</TooltipContent>
+            </Tooltip>
+          );
+        })()}
       </div>
 
       {/* Scrollable navigation + pinned + recents */}
@@ -155,30 +165,36 @@ function SidebarBody({
         <nav aria-label="Primary sidebar navigation" className="space-y-[1px]">
           {NAV_ITEMS.map(({ label, to, icon: Icon }) => {
             const isActive = pathname === to;
+            const linkEl = (
+              <Link
+                key={to}
+                to={to}
+                state={{ skipThinking: true }}
+                onClick={onNavigate}
+                aria-label={label}
+                aria-current={isActive ? 'page' : undefined}
+                className={`flex h-[34px] items-center overflow-hidden rounded-lg ${
+                  collapsed ? 'w-9 justify-center' : 'w-full gap-[10px] px-2.5'
+                } ${
+                  isActive
+                    ? 'bg-[#D97757] font-medium text-white'
+                    : 'font-normal text-[#2E2D2A] hover:bg-[#E8E8E2] hover:text-[#141413]'
+                }`}
+              >
+                <Icon
+                  className={`h-4 w-4 shrink-0 ${isActive ? 'text-white' : 'text-[#4A4945]'}`}
+                  strokeWidth={1.8}
+                  aria-hidden="true"
+                />
+                {!collapsed ? <span className="truncate text-[14.5px]">{label}</span> : null}
+              </Link>
+            );
+
+            if (!collapsed) return linkEl;
+
             return (
-              <Tooltip key={to} open={collapsed ? undefined : false}>
-                <TooltipTrigger asChild>
-                  <Link
-                    to={to}
-                    onClick={onNavigate}
-                    aria-label={label}
-                    aria-current={isActive ? 'page' : undefined}
-                    className={`flex h-[34px] items-center overflow-hidden rounded-lg transition-colors ${
-                      collapsed ? 'w-9 justify-center' : 'w-full gap-[10px] px-2.5'
-                    } ${
-                      isActive
-                        ? 'bg-[#D8D8D1] font-medium text-[#141413]'
-                        : 'font-normal text-[#2E2D2A] hover:bg-[#E8E8E2] hover:text-[#141413]'
-                    }`}
-                  >
-                    <Icon
-                      className="h-4 w-4 shrink-0 text-[#4A4945]"
-                      strokeWidth={1.8}
-                      aria-hidden="true"
-                    />
-                    {!collapsed ? <span className="truncate text-[14.5px]">{label}</span> : null}
-                  </Link>
-                </TooltipTrigger>
+              <Tooltip key={to}>
+                <TooltipTrigger asChild>{linkEl}</TooltipTrigger>
                 <TooltipContent side="right">{label}</TooltipContent>
               </Tooltip>
             );
@@ -200,17 +216,17 @@ function SidebarBody({
                     <Link
                       key={project.id}
                       to={`/projects?project=${project.id}`}
-                      state={{ recentLabel: project.title }}
+                      state={{ recentLabel: project.title, skipThinking: true }}
                       onClick={onNavigate}
                       aria-current={isPinnedActive ? 'page' : undefined}
-                      className={`flex h-[34px] items-center gap-[10px] rounded-lg px-2.5 text-[14.5px] transition-colors ${
+                      className={`flex h-[34px] items-center gap-[10px] rounded-lg px-2.5 text-[14.5px] ${
                         isPinnedActive
-                          ? 'bg-[#D8D8D1] font-medium text-[#141413]'
+                          ? 'bg-[#D97757] font-medium text-white'
                           : 'font-normal text-[#2E2D2A] hover:bg-[#E8E8E2] hover:text-[#141413]'
                       }`}
                     >
                       <Inbox
-                        className="h-4 w-4 shrink-0 text-[#4A4945]"
+                        className={`h-4 w-4 shrink-0 ${isPinnedActive ? 'text-white' : 'text-[#4A4945]'}`}
                         strokeWidth={1.8}
                         aria-hidden="true"
                       />
@@ -230,17 +246,26 @@ function SidebarBody({
                 </p>
               ) : (
                 <div className="space-y-[1px]">
-                  {recents.map((item, index) => (
-                    <Link
-                      key={`${item.to}-${index}`}
-                      to={item.to}
-                      state={{ fromRecents: true }}
-                      onClick={onNavigate}
-                      className="flex h-[34px] items-center rounded-lg px-2.5 text-[14.5px] font-normal text-[#2E2D2A] transition-colors hover:bg-[#E8E8E2] hover:text-[#141413]"
-                    >
-                      <span className="truncate">{item.label}</span>
-                    </Link>
-                  ))}
+                  {recents.map((item, index) => {
+                    const isRecentActive =
+                      pathname === '/search' && item.to === `${pathname}${search}`;
+                    return (
+                      <Link
+                        key={`${item.to}-${index}`}
+                        to={item.to}
+                        state={{ fromRecents: true, skipThinking: true }}
+                        onClick={onNavigate}
+                        aria-current={isRecentActive ? 'page' : undefined}
+                        className={`flex h-[34px] items-center rounded-lg px-2.5 text-[14.5px] ${
+                          isRecentActive
+                            ? 'bg-[#D97757] font-medium text-white'
+                            : 'font-normal text-[#2E2D2A] hover:bg-[#E8E8E2] hover:text-[#141413]'
+                        }`}
+                      >
+                        <span className="truncate">{item.label}</span>
+                      </Link>
+                    );
+                  })}
                 </div>
               )}
             </div>
@@ -254,20 +279,27 @@ function SidebarBody({
           <TooltipTrigger asChild>
             <Link
               to="/about"
+              state={{ skipThinking: true }}
               onClick={onNavigate}
               aria-label="Dwight"
-              className={`flex items-center overflow-hidden rounded-lg transition-colors hover:bg-[#EFEFED] ${
+              className={`group flex items-center overflow-hidden rounded-lg transition-colors hover:bg-[#D97757] ${
                 collapsed ? 'h-9 w-9 justify-center' : 'gap-2.5 px-2 py-1.5'
               }`}
             >
-              <span className="inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-[#141413] text-[12px] font-semibold text-white">
+              <span className="inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-[#141413] text-[12px] font-semibold text-white transition-colors group-hover:bg-white group-hover:text-[#D97757]">
                 D
               </span>
               {!collapsed ? (
                 <div className="flex min-w-0 items-center gap-1 text-[13px]">
-                  <span className="truncate font-medium text-[#141413]">Dwight</span>
-                  <span className="text-[#6B6A65]">&middot;</span>
-                  <span className="truncate text-[12px] text-[#5C5B57]">Full Stack Developer</span>
+                  <span className="truncate font-medium text-[#141413] transition-colors group-hover:text-white">
+                    Dwight
+                  </span>
+                  <span className="text-[#6B6A65] transition-colors group-hover:text-white/80">
+                    &middot;
+                  </span>
+                  <span className="truncate text-[12px] text-[#5C5B57] transition-colors group-hover:text-white/90">
+                    Full Stack Developer
+                  </span>
                 </div>
               ) : null}
             </Link>
