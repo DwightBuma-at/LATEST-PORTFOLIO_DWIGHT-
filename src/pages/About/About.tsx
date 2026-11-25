@@ -80,27 +80,102 @@ export default function About() {
           </p>
         </div>
 
-        {/* Wide responsive layout: bio paragraphs + 7-photo stacked deck */}
-        <div className="grid gap-8 lg:grid-cols-[1fr_340px] lg:items-start lg:gap-10">
-          {/* Staggered Bio paragraphs */}
-          <div className="space-y-4 font-[family-name:var(--font-geist)] text-[15.5px] leading-[1.78] text-[#2E2D2A]">
-            {portfolio.aboutParagraphs.map((paragraph, index) => {
-              const delay = 0.08 * (index + 1);
+        {/* Interactive 7-Photo Stacked Deck directly below subtitle */}
+        <motion.div
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.48, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
+          className="flex flex-col items-start gap-3"
+        >
+          <div className="relative h-[240px] w-full max-w-[420px] sm:h-[270px]">
+            {/* Back-most subtle stacked card */}
+            <div
+              aria-hidden="true"
+              className={`absolute inset-0 translate-x-2.5 translate-y-1.5 rotate-[3deg] rounded-2xl border transition-colors ${
+                isWarmBeige
+                  ? 'border-[#DFDBD0] bg-[#E8E3D8]'
+                  : 'border-[#E6E6E2] bg-[#EFEFED]'
+              }`}
+            />
+            {/* Middle subtle stacked card */}
+            <div
+              aria-hidden="true"
+              className={`absolute inset-0 -translate-x-1.5 translate-y-1 -rotate-[2.5deg] rounded-2xl border transition-colors ${
+                isWarmBeige
+                  ? 'border-[#D8D3C7] bg-[#EFEBE2]'
+                  : 'border-[#E2E2DD] bg-[#F5F5F3]'
+              }`}
+            />
 
-              if (!paragraph.includes(ADDU_LABEL)) {
-                return (
-                  <motion.p
-                    key={index}
-                    initial={{ opacity: 0, y: 5 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.42, delay, ease: [0.16, 1, 0.3, 1] }}
-                  >
-                    {paragraph}
-                  </motion.p>
-                );
-              }
+            {/* Active clickable photo card */}
+            <AnimatePresence mode="popLayout" initial={false}>
+              <motion.button
+                key={currentPhoto.id}
+                type="button"
+                onClick={handleNextPhoto}
+                aria-label={`${currentPhoto.caption}. Click to view next photo.`}
+                initial={{ opacity: 0, scale: 0.94, x: 24, rotate: 2.5 }}
+                animate={{ opacity: 1, scale: 1, x: 0, rotate: 0 }}
+                exit={{ opacity: 0, scale: 0.94, x: -28, rotate: -3 }}
+                transition={{ type: 'spring', stiffness: 320, damping: 28 }}
+                className={`absolute inset-0 flex w-full cursor-pointer flex-col items-center justify-center gap-2 rounded-2xl border border-dashed shadow-[0_6px_24px_rgba(0,0,0,0.06)] transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#D97757] ${
+                  isWarmBeige
+                    ? 'border-[#C9C3B6] bg-[#FAF8F3] text-[#3D3C38] hover:border-[#B8B1A2]'
+                    : 'border-[#D0D0CA] bg-white text-[#3D3C38] hover:border-[#B8B8B0]'
+                }`}
+              >
+                <span
+                  className={`inline-flex h-12 w-12 items-center justify-center rounded-full ${
+                    isWarmBeige ? 'bg-[#ECE8DF]' : 'bg-[#F4F4F2]'
+                  }`}
+                >
+                  <Camera
+                    className="h-5 w-5 text-[#5C5B57]"
+                    strokeWidth={1.75}
+                    aria-hidden="true"
+                  />
+                </span>
+                <span className="font-[family-name:var(--font-geist)] text-[14px] font-medium text-[#141413]">
+                  {currentPhoto.label}
+                </span>
+                <span className="font-[family-name:var(--font-geist)] text-[12px] text-[#6B6A65]">
+                  Click photo to cycle ({activeIndex + 1} / {PHOTO_SLOTS.length})
+                </span>
+              </motion.button>
+            </AnimatePresence>
+          </div>
 
-              const [before, after] = paragraph.split(ADDU_LABEL);
+          {/* Compact dot indicators */}
+          <div
+            className="flex w-full max-w-[420px] items-center justify-center gap-1.5"
+            role="tablist"
+            aria-label="Select photo"
+          >
+            {PHOTO_SLOTS.map((slot, index) => {
+              const isSelected = index === activeIndex;
+              return (
+                <button
+                  key={slot.id}
+                  type="button"
+                  role="tab"
+                  aria-selected={isSelected}
+                  aria-label={slot.caption}
+                  onClick={() => setActiveIndex(index)}
+                  className={`h-1.5 rounded-full transition-all ${
+                    isSelected ? 'w-5 bg-[#D97757]' : 'w-1.5 bg-[#CFCAC0] hover:bg-[#9C978D]'
+                  }`}
+                />
+              );
+            })}
+          </div>
+        </motion.div>
+
+        {/* Staggered Bio paragraphs */}
+        <div className="space-y-4 font-[family-name:var(--font-geist)] text-[15.5px] leading-[1.78] text-[#2E2D2A]">
+          {portfolio.aboutParagraphs.map((paragraph, index) => {
+            const delay = 0.08 * (index + 1);
+
+            if (!paragraph.includes(ADDU_LABEL)) {
               return (
                 <motion.p
                   key={index}
@@ -108,113 +183,37 @@ export default function About() {
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.42, delay, ease: [0.16, 1, 0.3, 1] }}
                 >
-                  {before}
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <a
-                        href={ADDU_URL}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="font-medium text-[#1D4ED8] underline underline-offset-2 transition-colors hover:text-[#1E40AF]"
-                      >
-                        {ADDU_LABEL}
-                      </a>
-                    </TooltipTrigger>
-                    <TooltipContent side="top">Visit link</TooltipContent>
-                  </Tooltip>
-                  {after}
+                  {paragraph}
                 </motion.p>
               );
-            })}
-          </div>
+            }
 
-          {/* Interactive 7-Photo Stacked Deck Placeholder */}
-          <motion.div
-            initial={{ opacity: 0, y: 8 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.48, delay: 0.16, ease: [0.16, 1, 0.3, 1] }}
-            className="flex flex-col items-center gap-3 lg:sticky lg:top-10"
-          >
-            <div className="relative h-[250px] w-full max-w-[340px] sm:h-[280px]">
-              {/* Back-most subtle stacked card */}
-              <div
-                aria-hidden="true"
-                className={`absolute inset-0 translate-x-2.5 translate-y-1.5 rotate-[3deg] rounded-2xl border transition-colors ${
-                  isWarmBeige
-                    ? 'border-[#DFDBD0] bg-[#E8E3D8]'
-                    : 'border-[#E6E6E2] bg-[#EFEFED]'
-                }`}
-              />
-              {/* Middle subtle stacked card */}
-              <div
-                aria-hidden="true"
-                className={`absolute inset-0 -translate-x-1.5 translate-y-1 -rotate-[2.5deg] rounded-2xl border transition-colors ${
-                  isWarmBeige
-                    ? 'border-[#D8D3C7] bg-[#EFEBE2]'
-                    : 'border-[#E2E2DD] bg-[#F5F5F3]'
-                }`}
-              />
-
-              {/* Active clickable photo card */}
-              <AnimatePresence mode="popLayout" initial={false}>
-                <motion.button
-                  key={currentPhoto.id}
-                  type="button"
-                  onClick={handleNextPhoto}
-                  aria-label={`${currentPhoto.caption}. Click to view next photo.`}
-                  initial={{ opacity: 0, scale: 0.94, x: 24, rotate: 2.5 }}
-                  animate={{ opacity: 1, scale: 1, x: 0, rotate: 0 }}
-                  exit={{ opacity: 0, scale: 0.94, x: -28, rotate: -3 }}
-                  transition={{ type: 'spring', stiffness: 320, damping: 28 }}
-                  className={`absolute inset-0 flex w-full cursor-pointer flex-col items-center justify-center gap-2 rounded-2xl border border-dashed shadow-[0_6px_24px_rgba(0,0,0,0.06)] transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#D97757] ${
-                    isWarmBeige
-                      ? 'border-[#C9C3B6] bg-[#FAF8F3] text-[#3D3C38] hover:border-[#B8B1A2]'
-                      : 'border-[#D0D0CA] bg-white text-[#3D3C38] hover:border-[#B8B8B0]'
-                  }`}
-                >
-                  <span
-                    className={`inline-flex h-12 w-12 items-center justify-center rounded-full ${
-                      isWarmBeige ? 'bg-[#ECE8DF]' : 'bg-[#F4F4F2]'
-                    }`}
-                  >
-                    <Camera
-                      className="h-5 w-5 text-[#5C5B57]"
-                      strokeWidth={1.75}
-                      aria-hidden="true"
-                    />
-                  </span>
-                  <span className="font-[family-name:var(--font-geist)] text-[14px] font-medium text-[#141413]">
-                    {currentPhoto.label}
-                  </span>
-                  <span className="font-[family-name:var(--font-geist)] text-[12px] text-[#6B6A65]">
-                    Click photo to cycle ({activeIndex + 1} / {PHOTO_SLOTS.length})
-                  </span>
-                </motion.button>
-              </AnimatePresence>
-            </div>
-
-            {/* Compact dot indicators */}
-            <div className="flex items-center gap-1.5" role="tablist" aria-label="Select photo">
-              {PHOTO_SLOTS.map((slot, index) => {
-                const isSelected = index === activeIndex;
-                return (
-                  <button
-                    key={slot.id}
-                    type="button"
-                    role="tab"
-                    aria-selected={isSelected}
-                    aria-label={slot.caption}
-                    onClick={() => setActiveIndex(index)}
-                    className={`h-1.5 rounded-full transition-all ${
-                      isSelected
-                        ? 'w-5 bg-[#D97757]'
-                        : 'w-1.5 bg-[#CFCAC0] hover:bg-[#9C978D]'
-                    }`}
-                  />
-                );
-              })}
-            </div>
-          </motion.div>
+            const [before, after] = paragraph.split(ADDU_LABEL);
+            return (
+              <motion.p
+                key={index}
+                initial={{ opacity: 0, y: 5 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.42, delay, ease: [0.16, 1, 0.3, 1] }}
+              >
+                {before}
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <a
+                      href={ADDU_URL}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="font-medium text-[#1D4ED8] underline underline-offset-2 transition-colors hover:text-[#1E40AF]"
+                    >
+                      {ADDU_LABEL}
+                    </a>
+                  </TooltipTrigger>
+                  <TooltipContent side="top">Visit link</TooltipContent>
+                </Tooltip>
+                {after}
+              </motion.p>
+            );
+          })}
         </div>
 
         <KeepExploring
